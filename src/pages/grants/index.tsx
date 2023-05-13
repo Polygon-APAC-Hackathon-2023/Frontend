@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { useGrantCartStore } from "../../utils/store";
+import { useGrantCartStore } from "../../../utils/store";
 import { toast } from "react-hot-toast";
 
 interface Grant {
