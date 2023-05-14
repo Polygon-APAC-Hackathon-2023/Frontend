@@ -3,6 +3,7 @@ import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useGrantCartStore } from "../../../utils/store";
 import { toast } from "react-hot-toast";
 import React from "react";
+import TrashIcon from "@/components/icons/Trash";
 
 interface Grant {
   id: string;
@@ -12,7 +13,7 @@ interface Grant {
 }
 
 export default function CheckoutGrants() {
-  const { grants, updateCart } = useGrantCartStore();
+  const { grants, updateCart, removeFromCart } = useGrantCartStore();
 
   const checkout = () => {
     toast.success("Grant added to cart!");
@@ -22,7 +23,10 @@ export default function CheckoutGrants() {
     updateCart(id, Number(amount));
   };
 
-  console.log(grants);
+  const removeGrantFromCart = (grantId: string) => {
+    removeFromCart(grantId);
+    toast.success("Grant removed from cart!");
+  };
 
   return grants ? (
     <main className="flex min-h-screen flex-row items-start px-8 py-24 gap-6">
@@ -50,6 +54,12 @@ export default function CheckoutGrants() {
                 />
                 <p>USDC</p>
               </div>
+              <button
+                onClick={() => removeGrantFromCart(grant.id)}
+                className="mx-4 max-w-[24px] cursor-pointer"
+              >
+                <TrashIcon className="fill-red-500 w-[24px]" />
+              </button>
             </div>
           ))}
       </div>
