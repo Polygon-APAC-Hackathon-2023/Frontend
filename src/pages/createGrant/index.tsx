@@ -12,22 +12,51 @@ import {
   NumberInputField,
   NumberInputStepper,
 } from "@chakra-ui/react";
+import { localhost } from "@wagmi/chains";
 import { useState } from "react";
+import { MetaMaskConnector } from "wagmi/connectors/metaMask";
+import {
+  useContractEvent,
+  useContractWrite,
+  usePrepareContractWrite,
+  useWaitForTransaction,
+} from "wagmi";
+import Hypercert from "../../../public/Hypercert.json";
+import { BigNumber } from "ethers";
 
 const CreateGrant = () => {
   const [name, setName] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   const [workScope, setWorkScope] = useState<string>("");
   const [startDate, setStartDate] = useState<string>("");
-  const [endDate, setEndDate] = useState<string>("");
+  const [endDate, setEndDate] = useState<number>(0);
   const [contributors, setContributors] = useState<string>("");
+
+  const { config } = usePrepareContractWrite({
+    address: "0x5fbdb2315678afecb367f032d93f642f64180aa3",
+    abi: Hypercert.abi,
+    functionName: "createGrant",
+    args: [name, BigNumber.from(BigInt(endDate))],
+  });
+  const { data, write } = useContractWrite(config);
+
+  const { isLoading, isSuccess } = useWaitForTransaction({
+    hash: data?.hash,
+  });
 
   const handleSubmit = async () => {
     //call contract
     console.log(name, description, workScope, startDate, endDate);
     uploadMetadata({ name: name });
+    if (write) {
+      write();
+    }
     // await fetchData("ad");
   };
+
+  const connector = new MetaMaskConnector({
+    chains: [localhost],
+  });
 
   return (
     <>
@@ -73,7 +102,9 @@ const CreateGrant = () => {
                     placeholder="Select Date and Time"
                     size="lg"
                     type="date"
-                    onChange={(e) => setEndDate(e.target.value)}
+                    onChange={(e) => {
+                      setEndDate(new Date(e.target.value).getTime() / 1000);
+                    }}
                   />
                 </div>
               </div>
@@ -91,6 +122,10 @@ const CreateGrant = () => {
                 Create
               </Button>
             </FormControl>
+            <div>
+              {isLoading && <p>Waiting for transaction to be mined...</p>}
+              {isSuccess && <p>Transaction was successful!</p>}
+            </div>
           </div>
         </div>
       </div>
