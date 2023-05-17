@@ -7,6 +7,8 @@ import { localhost, polygonMumbai } from "wagmi/chains";
 import { alchemyProvider } from "wagmi/providers/alchemy";
 import { publicProvider } from "wagmi/providers/public";
 import { ChakraProvider } from "@chakra-ui/react";
+import { Toaster } from "react-hot-toast";
+
 const { chains, provider } = configureChains(
   [polygonMumbai, localhost],
   [
@@ -31,6 +33,7 @@ export default function App({ Component, pageProps }: AppProps) {
       <RainbowKitProvider chains={chains}>
         <ChakraProvider>
           <Component {...pageProps} />
+          <Toaster />
         </ChakraProvider>
       </RainbowKitProvider>
     </WagmiConfig>
