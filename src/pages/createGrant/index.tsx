@@ -33,7 +33,7 @@ const CreateGrant = () => {
   const [contributors, setContributors] = useState<string>("");
 
   const { config } = usePrepareContractWrite({
-    address: "0x5fbdb2315678afecb367f032d93f642f64180aa3",
+    address: "0x5Ce3Ff13abBbF8fA9Fd8F22CFBB3b872bDe06be3",
     abi: Hypercert.abi,
     functionName: "createGrant",
     args: [name, BigNumber.from(BigInt(endDate))],
