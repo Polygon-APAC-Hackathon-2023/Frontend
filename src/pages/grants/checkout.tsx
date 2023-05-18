@@ -1,29 +1,111 @@
 import Image from "next/image";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useGrantCartStore } from "../../../utils/store";
 import { toast } from "react-hot-toast";
-import React from "react";
+import React, { useMemo, useState } from "react";
 import TrashIcon from "@/components/icons/Trash";
-
-interface Grant {
-  id: string;
-  name: string;
-  description: string;
-  image: string;
-}
+import {
+  useAccount,
+  useContractRead,
+  useContractWrite,
+  usePrepareContractWrite,
+  useWaitForTransaction,
+} from "wagmi";
+import { FUNDING_POOL_CONTRACT, USDC_CONTRACT } from "../../../utils/constants";
+import { BigNumber, ethers } from "ethers";
+import { useRouter } from "next/router";
 
 export default function CheckoutGrants() {
-  const { grants, updateCart, removeFromCart } = useGrantCartStore();
+  const { grants, updateCart, removeFromCart, clearCart } = useGrantCartStore();
+  const router = useRouter();
+  const totalAmount = useMemo(
+    () => grants.reduce((prev, curr) => prev + curr.amount, 0),
+    [grants]
+  );
 
-  const checkout = () => {
-    toast.success("Grant added to cart!");
+  const { address } = useAccount();
+
+  const { data: allowance } = useContractRead({
+    ...USDC_CONTRACT,
+    functionName: "allowance",
+    args: [address, FUNDING_POOL_CONTRACT.address],
+  });
+
+  const { config: donateConfig } = usePrepareContractWrite({
+    ...FUNDING_POOL_CONTRACT,
+    functionName: "depositFunds",
+    args: [
+      grants.map((grant) => BigNumber.from(grant.id.toString())),
+      grants.map((grant) => ethers.utils.parseEther(grant.amount.toString())),
+      ethers.utils.parseEther(totalAmount.toString()),
+      USDC_CONTRACT.address,
+    ],
+  });
+
+  const {
+    data: donateData,
+    write: donate,
+    error,
+  } = useContractWrite(donateConfig);
+
+  const { config: allowanceConfig } = usePrepareContractWrite({
+    ...USDC_CONTRACT,
+    functionName: "approve",
+    args: [
+      FUNDING_POOL_CONTRACT.address,
+      ethers.utils.parseEther(`${totalAmount}`),
+    ],
+  });
+
+  const { data: approveData, write: approve } =
+    useContractWrite(allowanceConfig);
+
+  const { isLoading: approving, isSuccess: approved } = useWaitForTransaction({
+    hash: approveData?.hash,
+  });
+
+  const { isLoading: donating, isSuccess: donated } = useWaitForTransaction({
+    hash: donateData?.hash,
+  });
+
+  const checkout = async () => {
+    // First, we check if there is enough allowance
+    if (
+      allowance &&
+      (allowance as BigNumber).gte(
+        ethers.utils.parseEther(totalAmount.toString())
+      )
+    ) {
+      if (donate) {
+        donate();
+      }
+    } else {
+      if (approve) {
+        approve();
+      }
+    }
   };
 
-  const updateValue = (id: string, amount: string) => {
+  React.useEffect(() => {
+    if (approved) {
+      if (donate) {
+        donate();
+      }
+    }
+  }, [approved]);
+
+  React.useEffect(() => {
+    if (donated) {
+      clearCart();
+      toast.success("Checkout success!");
+      router.push("/grants");
+    }
+  }, [donated]);
+
+  const updateValue = (id: number, amount: string) => {
     updateCart(id, Number(amount));
   };
 
-  const removeGrantFromCart = (grantId: string) => {
+  const removeGrantFromCart = (grantId: number) => {
     removeFromCart(grantId);
     toast.success("Grant removed from cart!");
   };
@@ -55,7 +137,11 @@ export default function CheckoutGrants() {
                 <p>USDC</p>
               </div>
               <button
-                onClick={() => removeGrantFromCart(grant.id)}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  removeGrantFromCart(grant.id);
+                }}
                 className="mx-4 max-w-[24px] cursor-pointer"
               >
                 <TrashIcon className="fill-red-500 w-[24px]" />
@@ -78,10 +164,18 @@ export default function CheckoutGrants() {
           <hr className="border w-full my-4 border-black" />
           <div className="flex flex-row w-full items-center justify-between">
             <p>Total</p>
-            <p>{grants.reduce((prev, curr) => prev + curr.amount, 0)} USDC</p>
+            <p>{totalAmount} USDC</p>
           </div>
-          <button className="w-full rounded-full p-6 font-bold text-black bg-slate-400 my-4">
-            Checkout
+          <button
+            className="w-full rounded-full p-6 font-bold text-black bg-slate-400 my-4"
+            onClick={checkout}
+          >
+            {allowance &&
+            (allowance as BigNumber).gte(
+              ethers.utils.parseEther(totalAmount.toString())
+            )
+              ? "Checkout"
+              : "Approve & Send"}
           </button>
         </div>
       </div>

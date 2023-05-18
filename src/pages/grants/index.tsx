@@ -1,18 +1,12 @@
 import Image from "next/image";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useGrantCartStore } from "../../../utils/store";
 import { toast } from "react-hot-toast";
 import clsx from "clsx";
 import Link from "next/link";
-import {
-  paginatedIndexesConfig,
-  useContractInfiniteReads,
-  useContractRead,
-  useContractReads,
-} from "wagmi";
-import Hypercert from "../../../public/Hypercert.json";
+import { paginatedIndexesConfig, useContractInfiniteReads } from "wagmi";
 import { useEffect, useState } from "react";
 import { fetchData } from "@/services/uploadMeta";
+import { HYPERCERT_CONTRACT } from "../../../utils/constants";
 
 interface Grant {
   id: number;
@@ -28,22 +22,7 @@ export default function Grants() {
     grants: selectedGrants,
   } = useGrantCartStore();
   const [grants, setGrants] = useState<any>();
-
-  const contract = {
-    address: "0xf1542d2094cbb84f4b6c90ed100a1a36cbbff54c" as `0x${string}`,
-    abi: Hypercert.abi,
-  };
   const ITEMS_PER_PAGE = 12;
-
-  const { data } = useContractReads({
-    contracts: [
-      {
-        ...contract,
-        functionName: "latestUnusedId",
-      },
-    ],
-    watch: true,
-  });
 
   const { data: grantsData, fetchNextPage } = useContractInfiniteReads({
     cacheKey: "grants-data",
@@ -51,7 +30,7 @@ export default function Grants() {
       (index) => {
         return [
           {
-            ...contract,
+            ...HYPERCERT_CONTRACT,
             functionName: "uri",
             args: [index] as const,
           },
@@ -79,13 +58,13 @@ export default function Grants() {
         for await (const grantHash of page) {
           if (grantHash) {
             const data = await fetchData(grantHash as string);
-            index++;
             grants.push({
               id: index,
               name: data.name,
               description: data.description || "Donate to this grant!",
               image: data.image || `https://picsum.photos/${index}/256`,
             });
+            index++;
           }
         }
       }
@@ -124,7 +103,12 @@ export default function Grants() {
                   key={grant.id}
                 >
                   <div className="flex aspect-square w-full relative">
-                    <Image src={grant.image} alt="Random" fill />
+                    <Image
+                      src={grant.image}
+                      alt="Random"
+                      fill
+                      className="object-cover"
+                    />
                   </div>
                   <div className="flex flex-col w-full p-4 gap-y-2">
                     <p className="font-bold text-lg">{grant.name}</p>
