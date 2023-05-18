@@ -78,9 +78,12 @@ export default function Grants() {
   }, [grantsData, grantsData?.pages]);
 
   return (
-    <main
-      className={`flex min-h-screen flex-col items-center justify-between p-24`}
-    >
+    <main className={`flex min-h-screen flex-col items-center pt-8 px-24 pb-8`}>
+      <nav className="w-full mb-8 flex flex-row items-center justify-between">
+        <Link href="/">
+          <p className="font-bold text-xl">ReIgnite 🔥</p>
+        </Link>
+      </nav>
       <div className="flex flex-col items-center justify-center">
         <h1 className="font-bold my-6 text-2xl">Grants</h1>
         <div className="grid grid-cols-3 items-center justify-center w-full gap-6 lg:gap-x-12">
@@ -93,7 +96,7 @@ export default function Grants() {
                 <div
                   className={clsx(
                     "flex flex-col w-full items-center bg-slate-400 rounded-lg overflow-hidden max-w-xs hover:scale-110 transform transition-transform cursor-pointer",
-                    selected ? "border-4 border-green-500" : ""
+                    selected ? "border-4 border-emerald-500" : ""
                   )}
                   onClick={() =>
                     selected
@@ -122,10 +125,13 @@ export default function Grants() {
             })}
         </div>
         <Link
-          className="w-full items-center justify-center flex font-bold text-lg p-4 bg-slate-400 rounded-full max-w-xs my-8"
+          className="w-full items-center justify-center flex font-bold text-lg p-4 bg-slate-400 rounded-full max-w-xs my-8 relative"
           href="/grants/checkout"
         >
           Checkout
+          <span className="w-4 h-4 p-4 flex items-center justify-center bg-emerald-500 rounded-full absolute -top-4 right-0 text-white">
+            {selectedGrants.length}
+          </span>
         </Link>
       </div>
     </main>
