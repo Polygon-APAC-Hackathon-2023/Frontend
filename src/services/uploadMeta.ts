@@ -11,7 +11,7 @@ export const uploadMetadata = async (metadata: any) => {
   const node = await client;
   const data = JSON.stringify(metadata);
   const results = await node.add(data);
-  // console.log(results);
+  console.log(results);
   return results;
 };
 

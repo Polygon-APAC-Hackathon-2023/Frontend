@@ -31,12 +31,15 @@ const CreateGrant = () => {
   const [startDate, setStartDate] = useState<string>("");
   const [endDate, setEndDate] = useState<number>(0);
   const [contributors, setContributors] = useState<string>("");
+  const [result, setResult] = useState<string>("");
+  const [endGrant, setEndGrant] = useState<number>(0);
+  const [projectLink, setProjectLink] = useState<string>("");
 
   const { config } = usePrepareContractWrite({
-    address: "0x5Ce3Ff13abBbF8fA9Fd8F22CFBB3b872bDe06be3",
+    address: "0x0cDaa4A6df7b761C9785b399470e947e011E1955",
     abi: Hypercert.abi,
     functionName: "createGrant",
-    args: [name, BigNumber.from(BigInt(endDate))],
+    args: [name, BigNumber.from(BigInt(endGrant)), result],
   });
   const { data, write } = useContractWrite(config);
 
@@ -47,7 +50,20 @@ const CreateGrant = () => {
   const handleSubmit = async () => {
     //call contract
     console.log(name, description, workScope, startDate, endDate);
-    uploadMetadata({ name: name });
+    const result = await uploadMetadata({
+      title: name,
+      description: description,
+      image: "",
+      link: projectLink,
+      properties: {
+        workScope: workScope,
+        startDate: BigNumber.from(BigInt(startDate)),
+        endDate: BigNumber.from(BigInt(endDate)),
+        contributors: contributors,
+        endGrant: BigNumber.from(BigInt(endGrant)),
+      },
+    });
+    setResult(result.path);
     if (write) {
       write();
     }
@@ -85,10 +101,12 @@ const CreateGrant = () => {
                 type="text"
                 onChange={(e) => setWorkScope(e.target.value)}
               />
-              <FormHelperText>Work Scope</FormHelperText>
+              <div className="flex justify-center align-middle mt-[10px] text-[20px]">
+                <h1>Duration of Work</h1>
+              </div>
               <div className="flex justify-between align-middle">
                 <div>
-                  <FormLabel>Start Date</FormLabel>
+                  <FormLabel>Start Work Date</FormLabel>
                   <Input
                     placeholder="Select Date and Time"
                     size="lg"
@@ -97,7 +115,7 @@ const CreateGrant = () => {
                   />
                 </div>
                 <div>
-                  <FormLabel>End Date</FormLabel>
+                  <FormLabel>End Work Date</FormLabel>
                   <Input
                     placeholder="Select Date and Time"
                     size="lg"
@@ -113,6 +131,21 @@ const CreateGrant = () => {
                 type="text"
                 onChange={(e) => setContributors(e.target.value)}
               />
+              <FormLabel>End of Grant</FormLabel>
+              <Input
+                placeholder="Select Date and Time"
+                size="lg"
+                type="date"
+                onChange={(e) => {
+                  setEndGrant(new Date(e.target.value).getTime() / 1000);
+                }}
+              />
+              <FormLabel>Project Link</FormLabel>
+              <Input
+                type="text"
+                onChange={(e) => setProjectLink(e.target.value)}
+              />
+              <FormHelperText>Link to Project (example: Github)</FormHelperText>
               <Button
                 mt={4}
                 colorScheme="teal"
