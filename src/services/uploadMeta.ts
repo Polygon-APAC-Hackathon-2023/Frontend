@@ -11,22 +11,26 @@ export const uploadMetadata = async (metadata: any) => {
   const node = await client;
   const data = JSON.stringify(metadata);
   const results = await node.add(data);
-  console.log(results);
+  // console.log(results);
+  return results;
 };
 
 export const fetchData = async (hash: string) => {
   const node = await client;
-  console.log("masuk");
-  const stream = node.cat("QmbCBN7cjAdMhGrv65Xi5i1qs5VF6NTanHk1EMyofjkbWH");
+  const stream = node.cat(hash);
   const decoder = new TextDecoder();
   let data = "";
 
   for await (const chunk of stream) {
     // chunks of data are returned as a Uint8Array, convert it back to a string
-    data += decoder.decode(chunk, { stream: true });
+    try {
+      data += decoder.decode(chunk, { stream: true });
+    } catch (err) {
+      console.log(err);
+    }
   }
 
-  console.log("your data is", data);
+  return JSON.parse(data);
 };
 
 // QmbCBN7cjAdMhGrv65Xi5i1qs5VF6NTanHk1EMyofjkbWH
