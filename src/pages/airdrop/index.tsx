@@ -1,42 +1,15 @@
 import React, { useState } from "react";
 import { localhost, polygonMumbai } from "@wagmi/chains";
-import { useContractReads, useAccount, useConnect, useNetwork } from "wagmi";
+import { useContractRead, useAccount, useConnect, useNetwork } from "wagmi";
 import { MetaMaskConnector } from "wagmi/connectors/metaMask";
 import { InjectedConnector } from "wagmi/connectors/injected";
 import Hypercert from "../../../public/Hypercert.json";
 
-const hypercertContract = {
-  contractAddress: "0x0cDaa4A6df7b761C9785b399470e947e011E1955",
-  abi: Hypercert.abi,
-};
+const hypercertAddress = "0x2084200f96AFc5d2e0e59829F875F296d25F49D7";
 
 const connector = new MetaMaskConnector({
   chains: [localhost],
 });
-
-function test(selectedTokenID: string) {
-  const { data, isError, isLoading } = useContractReads({
-    contracts: [
-      {
-        functionName: "grantEnded",
-        args: [selectedTokenID],
-        ...hypercertContract,
-      },
-      {
-        functionName: "grantOwner",
-        args: [selectedTokenID],
-        ...hypercertContract,
-      },
-    ],
-  });
-
-  console.log(data);
-
-  const grantEnded = data ? [0] : false;
-  const grantOwner = data ? [1] : "";
-
-  return [grantEnded, grantOwner, isError, isLoading];
-}
 
 export default function ProgressBar() {
   const [selectedTokenID, setSelectedTokenID] = useState("");
@@ -65,16 +38,31 @@ export default function ProgressBar() {
       setInputError(false);
     }
 
-    const [grantEnded, grantOwner, isError, isLoading] = test(selectedTokenID);
+    const { data: dataOne } = useContractRead({
+      abi: Hypercert.abi,
+      address: hypercertAddress,
+      functionName: "grantEnded",
+      watch: true,
+      onError: (err: any) => {
+        console.error(err);
+      },
+    });
 
-    if (isError) {
-      // Handle the error
-      console.error(isError);
-    } else {
-      //if the grant ended returns true and the grant owner is the same as the address, then the grant is verified
-      if (grantEnded && grantOwner === address) {
-        setIsGrantVerified(true);
-      }
+    const { data: dataTwo } = useContractRead({
+      abi: Hypercert.abi,
+      address: hypercertAddress,
+      functionName: "grantOwner",
+      watch: true,
+      onError: (err: any) => {
+        console.error(err);
+      },
+    });
+
+    console.log(dataTwo === address);
+    // Perform a check before fetching contract data.
+    // If grantEnded is true and grantOwner is the same as the connected wallet address, then grant is verified
+    if (dataOne && dataTwo && dataOne === true && dataTwo === address) {
+      setIsGrantVerified(true);
     }
   };
 
