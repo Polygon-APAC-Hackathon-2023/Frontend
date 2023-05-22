@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { localhost, polygonMumbai } from "@wagmi/chains";
 import { useContractRead, useAccount, useConnect, useNetwork } from "wagmi";
 import { MetaMaskConnector } from "wagmi/connectors/metaMask";
@@ -20,16 +20,37 @@ export default function ProgressBar() {
   const [inputError, setInputError] = useState(false);
 
   const { isConnected, address } = useAccount();
+  const [isConnect, setIsConnect] = useState(false);
   const { chain, chains } = useNetwork();
   const { connect } = useConnect({
     connector: new InjectedConnector(),
   });
 
-  const handleTokenIDChange = (e) => {
+  const handleTokenIDChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value.replace(/\D/g, ""); // Replace non-numeric characters
     setSelectedTokenID(inputValue);
     setInputError(false); // Reset input error when token ID changes
   };
+
+  const { data: dataOne } = useContractRead({
+    abi: Hypercert.abi,
+    address: hypercertAddress,
+    functionName: "grantEnded",
+    watch: true,
+    onError: (err: any) => {
+      console.error(err);
+    },
+  });
+
+  const { data: dataTwo } = useContractRead({
+    abi: Hypercert.abi,
+    address: hypercertAddress,
+    functionName: "grantOwner",
+    watch: true,
+    onError: (err: any) => {
+      console.error(err);
+    },
+  });
 
   const handleVerifyGrant = async () => {
     if (selectedTokenID === "") {
@@ -37,26 +58,6 @@ export default function ProgressBar() {
     } else {
       setInputError(false);
     }
-
-    const { data: dataOne } = useContractRead({
-      abi: Hypercert.abi,
-      address: hypercertAddress,
-      functionName: "grantEnded",
-      watch: true,
-      onError: (err: any) => {
-        console.error(err);
-      },
-    });
-
-    const { data: dataTwo } = useContractRead({
-      abi: Hypercert.abi,
-      address: hypercertAddress,
-      functionName: "grantOwner",
-      watch: true,
-      onError: (err: any) => {
-        console.error(err);
-      },
-    });
 
     console.log(dataTwo === address);
     // Perform a check before fetching contract data.
@@ -80,26 +81,35 @@ export default function ProgressBar() {
     console.log("Airdrop initiated"); // Placeholder
   };
 
+  useEffect(() => {
+    if (isConnected) {
+      setIsConnect(true);
+    }
+  }, [isConnected]);
+
+
+
   return (
     <div className="flex flex-col items-center justify-center min-h-screen">
-      <h1 className="text-3xl font-bold mb-8">
-        Grant Airdrop to be initiated by
-        {isConnected ? (
-          <span className="text-blue-500">
-            {" "}
-            {address} on {chain?.name}
-          </span>
-        ) : (
-          //include a connect wallet button
-          <button
-            className="bg-blue-500 text-white rounded px-4 py-2 mb-4"
-            onClick={connect}
-          >
-            Connect Wallet
-          </button>
-        )}
-      </h1>
-
+      <div className="text-3xl font-bold mb-8 flex">
+      <h1 className="text-3xl font-bold mr-[5px]">Grant Airdrop to be initiated by</h1>
+    <div>
+      {isConnect && 
+        <p className="text-blue-500">
+          {" "}
+          {address} on {chain?.name}
+        </p>
+      }
+      {!isConnect &&
+        <button
+          className="bg-blue-500 text-white rounded px-4 py-2 mb-4"
+          onClick={() => connect()}
+        >
+          Connect Wallet
+        </button>
+      }
+    </div>
+      </div>
       {/* Section 1: Choose Grant */}
       <div className="flex items-center mb-6">
         <div
