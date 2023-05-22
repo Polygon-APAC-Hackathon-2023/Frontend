@@ -35,7 +35,8 @@ export default function ProgressBar() {
   const { data: dataOne } = useContractRead({
     abi: Hypercert.abi,
     address: hypercertAddress,
-    functionName: "grantEnded",
+    functionName: "grantEnded(uint256)",
+    args: [selectedTokenID],
     watch: true,
     onError: (err: any) => {
       console.error(err);
@@ -45,12 +46,16 @@ export default function ProgressBar() {
   const { data: dataTwo } = useContractRead({
     abi: Hypercert.abi,
     address: hypercertAddress,
-    functionName: "grantOwner",
+    functionName: "grantOwner(uint256)",
+    args: [selectedTokenID],
     watch: true,
     onError: (err: any) => {
       console.error(err);
     },
   });
+
+  console.log(dataOne);
+  console.log(dataTwo);
 
   const handleVerifyGrant = async () => {
     if (selectedTokenID === "") {
@@ -87,28 +92,28 @@ export default function ProgressBar() {
     }
   }, [isConnected]);
 
-
-
   return (
     <div className="flex flex-col items-center justify-center min-h-screen">
       <div className="text-3xl font-bold mb-8 flex">
-      <h1 className="text-3xl font-bold mr-[5px]">Grant Airdrop to be initiated by</h1>
-    <div>
-      {isConnect && 
-        <p className="text-blue-500">
-          {" "}
-          {address} on {chain?.name}
-        </p>
-      }
-      {!isConnect &&
-        <button
-          className="bg-blue-500 text-white rounded px-4 py-2 mb-4"
-          onClick={() => connect()}
-        >
-          Connect Wallet
-        </button>
-      }
-    </div>
+        <h1 className="text-3xl font-bold mr-[5px]">
+          Grant Airdrop to be initiated by
+        </h1>
+        <div>
+          {isConnect && (
+            <p className="text-blue-500">
+              {" "}
+              {address} on {chain?.name}
+            </p>
+          )}
+          {!isConnect && (
+            <button
+              className="bg-blue-500 text-white rounded px-4 py-2 mb-4"
+              onClick={() => connect()}
+            >
+              Connect Wallet
+            </button>
+          )}
+        </div>
       </div>
       {/* Section 1: Choose Grant */}
       <div className="flex items-center mb-6">
