@@ -10,8 +10,10 @@
   },
   "dependencies": {
     "@chakra-ui/react": "^2.6.1",
+    "@circle-fin/circle-sdk": "^2.0.0",
     "@emotion/react": "^11.11.0",
     "@emotion/styled": "^11.11.0",
+    "@polybase/client": "^0.6.0",
     "@rainbow-me/rainbowkit": "^0.12.13",
     "@tailwindcss/line-clamp": "^0.4.4",
     "@types/node": "20.1.1",
@@ -19,15 +21,18 @@
     "@types/react-dom": "18.2.4",
     "autoprefixer": "10.4.14",
     "clsx": "^1.2.1",
+    "dotenv": "^16.0.3",
     "eslint": "8.40.0",
     "eslint-config-next": "13.4.1",
     "ethers": "^5.7.2",
     "framer-motion": "^10.12.8",
+    "fs": "^0.0.1-security",
     "ipfs": "^0.66.0",
     "js-ipfs": "^0.0.301",
     "mime": "^3.0.0",
     "next": "13.4.1",
     "nft.storage": "^7.0.3",
+    "node-fetch": "^2.6.11",
     "postcss": "8.4.23",
     "react": "18.2.0",
     "react-dom": "18.2.0",
@@ -37,5 +42,8 @@
     "typescript": "5.0.4",
     "wagmi": "^0.12.13",
     "zustand": "^4.3.8"
+  },
+  "devDependencies": {
+    "@types/node-fetch": "^2.6.4"
   }
 }
