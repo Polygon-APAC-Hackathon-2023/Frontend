@@ -14,10 +14,13 @@ const connector = new MetaMaskConnector({
 export default function ProgressBar() {
   const [selectedTokenID, setSelectedTokenID] = useState("");
   const [isGrantVerified, setIsGrantVerified] = useState(false);
+  const [isGrantEnded, setIsGrantEnded] = useState(false);
+  const [grantOwner, setGrantOwner] = useState("");
   const [isFundsDeposited, setIsFundsDeposited] = useState(false);
   const [walletAddress, setWalletAddress] = useState("");
   const [maticAddress, setMaticAddress] = useState("");
   const [inputError, setInputError] = useState(false);
+  const [isVerificationClicked, setIsVerificationClicked] = useState(false);
 
   const { isConnected, address } = useAccount();
   const [isConnect, setIsConnect] = useState(false);
@@ -43,6 +46,11 @@ export default function ProgressBar() {
     },
   });
 
+  if (dataOne) {
+    const isGrantEnded = dataOne;
+    console.log(isGrantEnded);
+  }
+
   const { data: dataTwo } = useContractRead({
     abi: Hypercert.abi,
     address: hypercertAddress,
@@ -54,8 +62,8 @@ export default function ProgressBar() {
     },
   });
 
-  console.log(dataOne);
-  console.log(dataTwo);
+  if (dataTwo === address) {
+  }
 
   const handleVerifyGrant = async () => {
     if (selectedTokenID === "") {
@@ -64,12 +72,13 @@ export default function ProgressBar() {
       setInputError(false);
     }
 
-    console.log(dataTwo === address);
     // Perform a check before fetching contract data.
     // If grantEnded is true and grantOwner is the same as the connected wallet address, then grant is verified
-    if (dataOne && dataTwo && dataOne === true && dataTwo === address) {
+    if (isGrantEnded && grantOwner === address) {
       setIsGrantVerified(true);
     }
+
+    setIsVerificationClicked(true); // Set the state to true after verification
   };
 
   const handleDepositFunds = () => {
