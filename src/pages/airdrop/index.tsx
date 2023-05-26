@@ -152,8 +152,6 @@ export async function checkTransferStatus(walletID: number) {
 export default function ProgressBar() {
   const [selectedTokenID, setSelectedTokenID] = useState("");
   const [isGrantVerified, setIsGrantVerified] = useState(false);
-  const [isGrantEnded, setIsGrantEnded] = useState(false);
-  const [grantOwner, setGrantOwner] = useState("");
   const [isFundsDeposited, setIsFundsDeposited] = useState(false);
   const [isWalletAddressCreated, setIsWalletAddressCreated] = useState(false);
   const [walletAddress, setWalletAddress] = useState("");
@@ -180,7 +178,7 @@ export default function ProgressBar() {
     setDescription(e.target.value);
   };
 
-  const { data: dataOne } = useContractRead({
+  const { data: grantEnded } = useContractRead({
     abi: Hypercert.abi,
     address: hypercertAddress,
     functionName: "grantEnded(uint256)",
@@ -191,7 +189,7 @@ export default function ProgressBar() {
     },
   });
 
-  const { data: dataTwo } = useContractRead({
+  const { data: grantOwner } = useContractRead({
     abi: Hypercert.abi,
     address: hypercertAddress,
     functionName: "grantOwner(uint256)",
@@ -209,19 +207,15 @@ export default function ProgressBar() {
       setInputError(false);
     }
 
-    console.log("tokenidis:", selectedTokenID);
-    console.log(dataOne, dataTwo);
-
     // Perform a check before fetching contract data.
     // If grantEnded is true and grantOwner is the same as the connected wallet address, then grant is verified
-    if (isGrantEnded && grantOwner === address) {
+    if (grantEnded && grantOwner === address) {
       setIsGrantVerified(true);
+      setIsVerificationClicked(true); // Set the state to true after verification
     } else {
       setIsGrantVerified(false);
       alert("Grant has not ended or you are not the grant owner");
     }
-
-    setIsVerificationClicked(true); // Set the state to true after verification
   };
 
   const handleDepositFunds = async (description: string) => {
