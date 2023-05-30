@@ -3,7 +3,7 @@ import MockUSDC from "../public/MockUSDC.json";
 import FundingPool from "../public/FundingPool.json";
 
 export const HYPERCERT_CONTRACT = {
-  address: "0x5641aa9764b0dd1c973afb05fe443c385fddbb78" as `0x${string}`,
+  address: "0xbdF8b449aF7a98655943453e906B30EFF086b72C" as `0x${string}`,
   abi: Hypercert.abi,
 };
 
