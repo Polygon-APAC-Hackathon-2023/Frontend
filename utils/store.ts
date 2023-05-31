@@ -3,7 +3,7 @@ import { devtools, persist } from "zustand/middleware";
 
 // The info about a grant that will be checked out
 interface GrantCheckoutItem {
-  id: string;
+  id: number;
   image: string;
   name: string;
   amount: number;
@@ -11,9 +11,9 @@ interface GrantCheckoutItem {
 
 interface GrantCartState {
   grants: GrantCheckoutItem[];
-  addToCart: (grant: { id: string; image: string; name: string }) => void;
-  updateCart: (id: string, amount: number) => void;
-  removeFromCart: (grantId: string) => void;
+  addToCart: (grant: { id: number; image: string; name: string }) => void;
+  updateCart: (id: number, amount: number) => void;
+  removeFromCart: (grantId: number) => void;
   clearCart: () => void;
 }
 
@@ -34,7 +34,7 @@ export const useGrantCartStore = create<GrantCartState>()(
               },
             ],
           })),
-        updateCart: (id: string, amount: number) =>
+        updateCart: (id: number, amount: number) =>
           set((state) => ({
             grants: state.grants.map((g) =>
               g.id === id

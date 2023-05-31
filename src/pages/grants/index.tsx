@@ -1,37 +1,19 @@
 import Image from "next/image";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useGrantCartStore } from "../../../utils/store";
 import { toast } from "react-hot-toast";
 import clsx from "clsx";
 import Link from "next/link";
+import { paginatedIndexesConfig, useContractInfiniteReads } from "wagmi";
+import { useEffect, useState } from "react";
+import { fetchData } from "@/services/uploadMeta";
+import { HYPERCERT_CONTRACT } from "../../../utils/constants";
 
 interface Grant {
-  id: string;
+  id: number;
   name: string;
   description: string;
   image: string;
 }
-
-const grants: Grant[] = [
-  {
-    id: "0xa650a0661ad3cf8a4dc55505bc56e80f100b6e5e",
-    name: "Grant 1",
-    description: "This is a grant",
-    image: "https://picsum.photos/256",
-  },
-  {
-    id: "0x8950a0661ad3cf8a4dc55505bc56e80f100b6e5f",
-    name: "Grant 2",
-    description: "This is a grant 2",
-    image: "https://picsum.photos/256",
-  },
-  {
-    id: "0xah50a0661ad3cf8a4dc55505bc56e80f100b6e51",
-    name: "Grant 3",
-    description: "This is a grant 3",
-    image: "https://picsum.photos/256",
-  },
-];
 
 export default function Grants() {
   const {
@@ -39,58 +21,117 @@ export default function Grants() {
     removeFromCart,
     grants: selectedGrants,
   } = useGrantCartStore();
+  const [grants, setGrants] = useState<any>();
+  const ITEMS_PER_PAGE = 12;
+
+  const { data: grantsData, fetchNextPage } = useContractInfiniteReads({
+    cacheKey: "grants-data",
+    ...paginatedIndexesConfig(
+      (index) => {
+        return [
+          {
+            ...HYPERCERT_CONTRACT,
+            functionName: "uri",
+            args: [index] as const,
+          },
+        ];
+      },
+      { start: 0, perPage: ITEMS_PER_PAGE, direction: "increment" }
+    ),
+  });
 
   const addGrantToCart = (grant: Grant) => {
     addToCart(grant);
     toast.success("Grant added to cart!");
   };
 
-  const removeGrantFromCart = (grantId: string) => {
+  const removeGrantFromCart = (grantId: number) => {
     removeFromCart(grantId);
     toast.success("Grant removed from cart!");
   };
 
+  useEffect(() => {
+    const getGrantsInfo = async () => {
+      const grants = [];
+      let index = 0;
+      for await (const page of grantsData!.pages) {
+        for await (const grantHash of page) {
+          if (grantHash) {
+            const data = await fetchData(grantHash as string);
+            grants.push({
+              id: index,
+              name: data.name,
+              description: data.description || "Donate to this grant!",
+              image: data.image || `https://picsum.photos/${index}/256`,
+            });
+            index++;
+          }
+        }
+      }
+
+      setGrants(grants);
+    };
+
+    if (grantsData && grantsData.pages) {
+      getGrantsInfo();
+    }
+  }, [grantsData, grantsData?.pages]);
+
   return (
-    <main
-      className={`flex min-h-screen flex-col items-center justify-between p-24`}
-    >
+    <main className={`flex min-h-screen flex-col items-center pt-8 px-24 pb-8`}>
+      <nav className="w-full mb-8 flex flex-row items-center justify-between">
+        <Link href="/">
+          <p className="font-bold text-xl">ReIgnite 🔥</p>
+        </Link>
+      </nav>
       <div className="flex flex-col items-center justify-center">
         <h1 className="font-bold my-6 text-2xl">Grants</h1>
-        <div className="grid grid-cols-3 items-center justify-center w-full gap-6 lg:gap-x-12 cursor-pointer">
-          {grants.map((grant) => {
-            const selected = selectedGrants.some((obj) => obj.id === grant.id);
-            return (
-              <div
-                className={clsx(
-                  "flex flex-col w-full items-center bg-slate-400 rounded-lg overflow-hidden max-w-xs hover:scale-110 transform transition-transform",
-                  selected ? "border-4 border-green-500" : ""
-                )}
-                onClick={() =>
-                  selected
-                    ? removeGrantFromCart(grant.id)
-                    : addGrantToCart(grant)
-                }
-                key={grant.id}
-              >
-                <div className="flex aspect-square w-full relative">
-                  <Image src={grant.image} alt="Random" fill />
+        <div className="grid grid-cols-3 items-center justify-center w-full gap-6 lg:gap-x-12">
+          {grants &&
+            grants.map((grant: any) => {
+              const selected = selectedGrants.some(
+                (obj) => obj.id === grant.id
+              );
+              return (
+                <div
+                  className={clsx(
+                    "flex flex-col w-full items-center bg-slate-400 rounded-lg overflow-hidden max-w-xs hover:scale-110 transform transition-transform cursor-pointer",
+                    selected ? "border-4 border-emerald-500" : ""
+                  )}
+                  onClick={() =>
+                    selected
+                      ? removeGrantFromCart(grant.id)
+                      : addGrantToCart(grant)
+                  }
+                  key={grant.id}
+                >
+                  <div className="flex aspect-square w-full relative">
+                    <Image
+                      src={grant.image}
+                      alt="Random"
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
+                  <div className="flex flex-col w-full p-4 gap-y-2">
+                    <p className="font-bold text-lg">{grant.name}</p>
+                    <p className="line-clamp-3">{grant.description}</p>
+                    <p className="text-ellipsis overflow-hidden text-sm">
+                      Token ID: {grant.id}
+                    </p>
+                  </div>
                 </div>
-                <div className="flex flex-col w-full p-4 gap-y-2">
-                  <p className="font-bold text-lg">{grant.name}</p>
-                  <p className="line-clamp-3">{grant.description}</p>
-                  <p className="text-ellipsis overflow-hidden text-sm">
-                    Address: {grant.id}
-                  </p>
-                </div>
-              </div>
-            );
-          })}
+              );
+            })}
         </div>
         <Link
-          className="w-full items-center justify-center flex font-bold text-lg p-4 bg-slate-400 rounded-full max-w-xs my-8"
+          className="w-full items-center justify-center flex font-bold text-lg p-4 bg-slate-400 rounded-full max-w-xs my-8 relative"
           href="/grants/checkout"
         >
           Checkout
+          <span className="w-4 h-4 p-4 flex items-center justify-center bg-emerald-500 rounded-full absolute -top-4 right-0 text-white">
+            {selectedGrants.length}
+          </span>
         </Link>
       </div>
     </main>

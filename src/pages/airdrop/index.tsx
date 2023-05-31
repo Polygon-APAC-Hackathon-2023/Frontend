@@ -118,7 +118,7 @@ export async function checkTransferStatus(walletID: number) {
   return status;
 }
 
-export default function ProgressBar() {
+export default function Airdrop() {
   const [selectedTokenID, setSelectedTokenID] = useState("");
   const [isGrantVerified, setIsGrantVerified] = useState(false);
   const [isFundsDeposited, setIsFundsDeposited] = useState(false);
@@ -463,7 +463,16 @@ export default function ProgressBar() {
           </div>
         </div>
       ) : (
-        <div>{/* Content for managing the airdrop */}</div>
+        <div>
+          <div className="text-3xl font-bold mb-8 flex flex-col items-between text-center">
+            <h2 className="text-3xl font-bold">Manage Wallets</h2>
+            {/* Add your Manage Wallets code here */}
+          </div>
+          <div className="text-3xl font-bold mb-8 flex flex-col items-between text-center">
+            <h2 className="text-3xl font-bold">Airdrop History</h2>
+            {/* Add your Airdrop History code here */}
+          </div>
+        </div>
       )}
     </div>
   );
