@@ -105,7 +105,7 @@
         {
           "indexed": true,
           "internalType": "address",
-          "name": "_creator",
+          "name": "_grantCreator",
           "type": "address"
         }
       ],
@@ -149,6 +149,25 @@
       ],
       "name": "Withdrawed",
       "type": "event"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "name": "addressCounted",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
     },
     {
       "inputs": [
@@ -216,6 +235,49 @@
       "type": "function"
     },
     {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "donatedAddressNumber",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "donatedAddresses",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
       "inputs": [],
       "name": "donationPoolFunds",
       "outputs": [
@@ -280,7 +342,7 @@
               "type": "string"
             }
           ],
-          "internalType": "struct FundingPool.FundInfo[]",
+          "internalType": "struct FundInfo[]",
           "name": "_fundInfo",
           "type": "tuple[]"
         }
@@ -327,7 +389,7 @@
       "name": "hypercert",
       "outputs": [
         {
-          "internalType": "contract Hypercert",
+          "internalType": "contract IHypercert",
           "name": "",
           "type": "address"
         }
@@ -370,7 +432,13 @@
         }
       ],
       "name": "qFWithdraw",
-      "outputs": [],
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        }
+      ],
       "stateMutability": "nonpayable",
       "type": "function"
     },
@@ -416,7 +484,7 @@
     {
       "inputs": [
         {
-          "internalType": "contract Hypercert",
+          "internalType": "contract IHypercert",
           "name": "_hypercertAddress",
           "type": "address"
         }
@@ -545,7 +613,13 @@
         }
       ],
       "name": "treasuryWithdraw",
-      "outputs": [],
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        }
+      ],
       "stateMutability": "nonpayable",
       "type": "function"
     },

@@ -5,9 +5,8 @@ import { MetaMaskConnector } from "wagmi/connectors/metaMask";
 import { InjectedConnector } from "wagmi/connectors/injected";
 import Hypercert from "../../../public/Hypercert.json";
 import fetch from "node-fetch";
+import { HYPERCERT_CONTRACT } from "../../../utils/constants";
 const querystring = require("querystring");
-
-const hypercertAddress = "0x2084200f96AFc5d2e0e59829F875F296d25F49D7";
 
 const connector = new MetaMaskConnector({
   chains: [localhost, polygonMumbai],
@@ -155,8 +154,8 @@ export default function Airdrop() {
   //set is funds deposited to true
 
   const { data: grantEnded } = useContractRead({
-    abi: Hypercert.abi,
-    address: hypercertAddress,
+    abi: HYPERCERT_CONTRACT.abi,
+    address: HYPERCERT_CONTRACT.address,
     functionName: "grantEnded(uint256)",
     args: [selectedTokenID],
     watch: true,
@@ -166,8 +165,8 @@ export default function Airdrop() {
   });
 
   const { data: grantOwner } = useContractRead({
-    abi: Hypercert.abi,
-    address: hypercertAddress,
+    abi: HYPERCERT_CONTRACT.abi,
+    address: HYPERCERT_CONTRACT.address,
     functionName: "grantOwner(uint256)",
     args: [selectedTokenID],
     watch: true,
@@ -177,8 +176,8 @@ export default function Airdrop() {
   });
 
   const { data: grantInfo } = useContractRead({
-    abi: Hypercert.abi,
-    address: hypercertAddress,
+    abi: HYPERCERT_CONTRACT.abi,
+    address: HYPERCERT_CONTRACT.address,
     functionName: "grantInfo(uint256)",
     args: [selectedTokenID],
     watch: true,
@@ -233,7 +232,7 @@ export default function Airdrop() {
   const createAirdropParticipants = async (walletAddress: string) => {
     const idempotencyKey = uuidv4();
 
-    const grantName = grantInfo.grantName;
+    const grantName = (grantInfo as any).grantName;
     //remove all spaces from the grant name
     const newGrantName = grantName.replace(/\s/g, "");
     const url = "https://api-sandbox.circle.com/v1/addressBook/recipients";
@@ -261,7 +260,7 @@ export default function Airdrop() {
   const createPayouts = async () => {
     const idempotencyKey = uuidv4();
 
-    const grantName = grantInfo.grantName;
+    const grantName = (grantInfo as any).grantName;
     //remove all spaces from the grant name
     const newGrantName = grantName.replace(/\s/g, "");
     const url = `https://api-sandbox.circle.com/v1/addressBook/recipients?email=${newGrantName}%40reignite.com`;

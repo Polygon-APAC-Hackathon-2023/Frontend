@@ -294,6 +294,25 @@
           "type": "uint256"
         }
       ],
+      "name": "grantEndTime",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "_endTime",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_grandId",
+          "type": "uint256"
+        }
+      ],
       "name": "grantEnded",
       "outputs": [
         {
@@ -329,6 +348,11 @@
           "internalType": "address",
           "name": "grantOwner",
           "type": "address"
+        },
+        {
+          "internalType": "string",
+          "name": "grantURI",
+          "type": "string"
         }
       ],
       "stateMutability": "view",

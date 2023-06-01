@@ -23,6 +23,7 @@ import {
 } from "wagmi";
 import Hypercert from "../../../public/Hypercert.json";
 import { BigNumber } from "ethers";
+import { HYPERCERT_CONTRACT } from "../../../utils/constants";
 
 const CreateGrant = () => {
   const [name, setName] = useState<string>("");
@@ -36,8 +37,8 @@ const CreateGrant = () => {
   const [projectLink, setProjectLink] = useState<string>("");
 
   const { config } = usePrepareContractWrite({
-    address: "0x2084200f96AFc5d2e0e59829F875F296d25F49D7",
-    abi: Hypercert.abi,
+    address: HYPERCERT_CONTRACT.address,
+    abi: HYPERCERT_CONTRACT.abi,
     functionName: "createGrant",
     args: [name, BigNumber.from(BigInt(endGrant)), result],
   });

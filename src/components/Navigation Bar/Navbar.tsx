@@ -12,7 +12,7 @@ const Navbar = () => {
             <Link href="/createGrant">Create Grant</Link>
           </Button>
         </li>
-        <li>
+        <li className="mr-[10px]">
           <Button>
             <Link href="/grants">Explore</Link>
           </Button>

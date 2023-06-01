@@ -21,6 +21,10 @@ import { useState } from "react";
 import { BigNumber } from "ethers";
 import Timer from "../timer/Timer";
 import FundingPool from "../../../public/FundingPool.json";
+import {
+  FUNDING_POOL_CONTRACT,
+  HYPERCERT_CONTRACT,
+} from "../../../utils/constants";
 
 interface Props {
   tokenId: number;
@@ -29,18 +33,18 @@ interface Props {
 const CardComponent = ({ tokenId }: Props) => {
   const [grants, setGrants] = useState<any>({});
   const { data } = useContractRead({
-    address: "0x2084200f96AFc5d2e0e59829F875F296d25F49D7",
-    abi: Hypercert.abi,
+    address: HYPERCERT_CONTRACT.address,
+    abi: HYPERCERT_CONTRACT.abi,
     functionName: "grantInfo",
     args: [BigNumber.from(BigInt(tokenId))],
-    onSuccess: (data) => {
+    onSuccess: (data: any) => {
       console.log(data.grantEndTime.toNumber());
     },
   });
 
   const { config } = usePrepareContractWrite({
-    address: "0x6038C7CB8dd8519a9CeCcE25F6cdBc76B6cA9f2f",
-    abi: FundingPool.abi,
+    address: FUNDING_POOL_CONTRACT.address,
+    abi: FUNDING_POOL_CONTRACT.abi,
     functionName: "withdrawFunds",
     args: [
       BigNumber.from(BigInt(tokenId)),

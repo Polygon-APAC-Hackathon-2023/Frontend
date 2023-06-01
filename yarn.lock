@@ -5815,13 +5815,6 @@
   dependencies:
     "esutils" "^2.0.2"
 
-"domexception@^1.0.1":
-  "integrity" "sha512-raigMkn7CJNNo6Ihro1fzG7wr3fHuYVytzquZKX5n0yizGsTcYgzdIUwj1X9pK0VvjeihV+XiclP+DjwbsSKug=="
-  "resolved" "https://registry.npmjs.org/domexception/-/domexception-1.0.1.tgz"
-  "version" "1.0.1"
-  dependencies:
-    "webidl-conversions" "^4.0.2"
-
 "dot-case@^3.0.4":
   "integrity" "sha512-Kv5nKlh6yRrdrGvxeJ2e5y2eRUpkUosIW4A2AS38zwSz27zu7ufDwQPi5Jhs3XAlGNetl3bmnGhQsMtkKJnj3w=="
   "resolved" "https://registry.npmjs.org/dot-case/-/dot-case-3.0.4.tgz"
@@ -12752,15 +12745,6 @@
     "is-typedarray" "^1.0.0"
     "signal-exit" "^3.0.2"
     "typedarray-to-buffer" "^3.1.5"
-
-"wrtc@^0.4.6":
-  "integrity" "sha512-P6Hn7VT4lfSH49HxLHcHhDq+aFf/jd9dPY7lDHeFhZ22N3858EKuwm2jmnlPzpsRGEPaoF6XwkcxY5SYnt4f/g=="
-  "resolved" "https://registry.npmjs.org/wrtc/-/wrtc-0.4.7.tgz"
-  "version" "0.4.7"
-  dependencies:
-    "node-pre-gyp" "^0.13.0"
-  optionalDependencies:
-    "domexception" "^1.0.1"
 
 "ws@*", "ws@^7.4.0", "ws@^7.4.5", "ws@7.4.6":
   "integrity" "sha512-YmhHDO4MzaDLB+M9ym/mDA5z0naX8j7SIlT8f8z+I0VtzsRbekxEutHSme7NPS2qE8StCYQNUnfWdXta/Yu85A=="

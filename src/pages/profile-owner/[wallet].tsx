@@ -7,6 +7,7 @@ import Hypercert from "../../../public/Hypercert.json";
 import { BigNumber, ethers } from "ethers";
 import { useEffect, useState } from "react";
 import { isAddress } from "ethers/lib/utils.js";
+import { HYPERCERT_CONTRACT } from "../../../utils/constants";
 
 const Profile = () => {
   const router = useRouter();
@@ -18,8 +19,8 @@ const Profile = () => {
   const [grantData, setGrantData] = useState<Array<any>>([]);
   //fetch what grant they created
   const { data } = useContractRead({
-    address: "0x2084200f96AFc5d2e0e59829F875F296d25F49D7",
-    abi: Hypercert.abi,
+    address: HYPERCERT_CONTRACT.address,
+    abi: HYPERCERT_CONTRACT.abi,
     functionName: "grantsCreatedByAddress",
     args: [address],
     onSuccess: (data: number[]) => {
