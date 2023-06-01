@@ -139,13 +139,13 @@ export default function CheckoutGrants() {
                 className="flex flex-row w-full items-center bg-slate-200 rounded-lg overflow-hidden text-black"
                 key={grant.id}
               >
-                <div className="flex aspect-square relative w-[128px]">
+                <div className="flex aspect-square relative min-w-[128px] min-h-[128px] w-full">
                   <Image src={grant.image} alt="Random" fill />
                 </div>
                 <div className="flex flex-col w-full p-4 gap-y-2">
-                  <p className="font-bold text-lg">{grant.name}</p>
+                  <p className="font-bold text-lg text-black">{grant.name}</p>
                   <p className="text-ellipsis overflow-hidden text-sm">
-                    Address: {grant.id}
+                    Token ID: {grant.id}
                   </p>
                 </div>
                 <div className="px-2 flex flex-row items-center gap-x-2">

@@ -66,12 +66,15 @@ const CardComponent = ({ tokenId }: Props) => {
   };
 
   return (
-    <Card maxW="sm">
+    <Card minW="xs">
       <CardBody>
         <Image
-          src="../../../../public/Grant.png"
+          src={`https://picsum.photos/id/${data?.grantName.charCodeAt(
+            0
+          )}/512/512`}
           alt="grant"
           borderRadius="lg"
+          className="w-full"
         />
         <Stack mt="6" spacing="3">
           <Heading size="md">Grant name: {data?.grantName}</Heading>

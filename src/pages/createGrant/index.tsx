@@ -50,7 +50,7 @@ const CreateGrant = () => {
 
   const handleSubmit = async () => {
     //call contract
-    console.log(name, description, workScope, startDate, endDate);
+
     const result = await uploadMetadata({
       title: name,
       description: description,
@@ -64,6 +64,7 @@ const CreateGrant = () => {
         endGrant: BigNumber.from(BigInt(endGrant)),
       },
     });
+
     setResult(result.path);
     if (write) {
       write();
