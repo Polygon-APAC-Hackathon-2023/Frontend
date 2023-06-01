@@ -28,7 +28,7 @@ const CreateGrant = () => {
   const [name, setName] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   const [workScope, setWorkScope] = useState<string>("");
-  const [startDate, setStartDate] = useState<string>("");
+  const [startDate, setStartDate] = useState<number>(0);
   const [endDate, setEndDate] = useState<number>(0);
   const [contributors, setContributors] = useState<string>("");
   const [result, setResult] = useState<string>("");
@@ -36,7 +36,7 @@ const CreateGrant = () => {
   const [projectLink, setProjectLink] = useState<string>("");
 
   const { config } = usePrepareContractWrite({
-    address: "0x0cDaa4A6df7b761C9785b399470e947e011E1955",
+    address: "0x2084200f96AFc5d2e0e59829F875F296d25F49D7",
     abi: Hypercert.abi,
     functionName: "createGrant",
     args: [name, BigNumber.from(BigInt(endGrant)), result],
@@ -111,7 +111,9 @@ const CreateGrant = () => {
                     placeholder="Select Date and Time"
                     size="lg"
                     type="date"
-                    onChange={(e) => setStartDate(e.target.value)}
+                    onChange={(e) => {
+                      setStartDate(new Date(e.target.value).getTime() / 1000);
+                    }}
                   />
                 </div>
                 <div>
