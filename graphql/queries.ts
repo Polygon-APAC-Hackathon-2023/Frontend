@@ -23,6 +23,7 @@ query GetHoldersOfTokenID($id:ID!) {
       account {
         id
       }
+      valueExact
     }
   }
 }
