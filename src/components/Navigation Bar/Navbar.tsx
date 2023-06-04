@@ -19,12 +19,17 @@ const Navbar = () => {
         </li>
         <li>
           {address ? (
-            <Button>
+            <Button className="mr-[10px]">
               <Link href={`/profile-owner/${address}`}>Profile</Link>
             </Button>
           ) : (
             <div></div>
           )}
+        </li>
+        <li>
+          <Button>
+            <Link href="/airdrop">Airdrop</Link>
+          </Button>
         </li>
       </ul>
     </div>

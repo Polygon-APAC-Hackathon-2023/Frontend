@@ -12,8 +12,8 @@ import {
   NumberInputField,
   NumberInputStepper,
 } from "@chakra-ui/react";
-import { localhost } from "@wagmi/chains";
-import { useState } from "react";
+import { localhost, polygonMumbai } from "@wagmi/chains";
+import { useEffect, useState } from "react";
 import { MetaMaskConnector } from "wagmi/connectors/metaMask";
 import {
   useContractEvent,
@@ -24,6 +24,8 @@ import {
 import Hypercert from "../../../public/Hypercert.json";
 import { BigNumber } from "ethers";
 import { HYPERCERT_CONTRACT } from "../../../utils/constants";
+import CreateGrantSuccess from "@/components/createGrantSuccess";
+import { useRouter, Router } from "next/router";
 
 const CreateGrant = () => {
   const [name, setName] = useState<string>("");
@@ -35,12 +37,18 @@ const CreateGrant = () => {
   const [result, setResult] = useState<string>("");
   const [endGrant, setEndGrant] = useState<number>(0);
   const [projectLink, setProjectLink] = useState<string>("");
+  const [state, setState] = useState<boolean>(false);
+
+  const router = useRouter();
 
   const { config } = usePrepareContractWrite({
     address: HYPERCERT_CONTRACT.address,
     abi: HYPERCERT_CONTRACT.abi,
     functionName: "createGrant",
     args: [name, BigNumber.from(BigInt(endGrant)), result],
+    onSuccess(test) {
+      console.log(config);
+    },
   });
   const { data, write } = useContractWrite(config);
 
@@ -51,7 +59,7 @@ const CreateGrant = () => {
   const handleSubmit = async () => {
     //call contract
 
-    const result = await uploadMetadata({
+    const data = await uploadMetadata({
       title: name,
       description: description,
       image: "",
@@ -65,16 +73,31 @@ const CreateGrant = () => {
       },
     });
 
-    setResult(result.path);
-    if (write) {
-      write();
-    }
+    setResult(data.path);
+    console.log("datapathis:", data.path);
+    setState(true);
+
     // await fetchData("ad");
   };
 
+  const handleSub = async () => {
+    await handleSubmit();
+    if (state) {
+      if (write) {
+        write();
+      }
+    }
+  };
+
   const connector = new MetaMaskConnector({
-    chains: [localhost],
+    chains: [localhost, polygonMumbai],
   });
+
+  useEffect(() => {
+    if (isSuccess) {
+      router.push("/");
+    }
+  }, [isSuccess]);
 
   return (
     <>
@@ -154,14 +177,14 @@ const CreateGrant = () => {
                 mt={4}
                 colorScheme="teal"
                 type="submit"
-                onClick={handleSubmit}
+                onClick={handleSub}
               >
                 Create
               </Button>
             </FormControl>
             <div>
-              {isLoading && <p>Waiting for transaction to be mined...</p>}
-              {isSuccess && <p>Transaction was successful!</p>}
+              {isSuccess && <h1>Success Transaction</h1>}
+              {isLoading && <h1>Waiting for transaction to complete</h1>}
             </div>
           </div>
         </div>
