@@ -5,8 +5,7 @@ declare global {
   var ipfs: IPFS.IPFS | undefined;
 }
 
-const client =
-  globalThis.ipfs || IPFS.create({ repo: "apac-" + Math.random() });
+const client = globalThis.ipfs || IPFS.create();
 
 export const uploadMetadata = async (metadata: any) => {
   const node = await client;
