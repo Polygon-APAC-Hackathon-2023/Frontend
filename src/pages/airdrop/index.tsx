@@ -202,15 +202,15 @@ export default function Index() {
     if (grantEnded && grantOwner === address) {
       setIsGrantVerified(true);
       setIsVerificationClicked(true); // Set the state to true after verification
-      setIsFundsDeposited(true);
     } else {
       setIsGrantVerified(false);
       alert("Grant has not ended or you are not the grant owner");
     }
 
     //call fetchHoldersOfTokenID() function
-    const holders = await fetchHoldersOfTokenID(selectedTokenID);
-    console.log(holders);
+    // console.log(selectedTokenID);
+    // const holders = await fetchHoldersOfTokenID(selectedTokenID);
+    // console.log("holders:", holders);
   };
 
   const handleDepositFunds = async (description: string) => {
@@ -364,7 +364,7 @@ export default function Index() {
             id: walletID,
           },
           destination: { type: "address_book", id: address[1] },
-          amount: { currency: "USD", amount: 0.1 },
+          amount: { currency: "USD", amount: 1 },
           toAmount: { currency: "USD" },
           idempotencyKey: idempotencyKey,
         }),
@@ -405,7 +405,7 @@ export default function Index() {
     <div className="flex flex-col items-center justify-center min-h-screen">
       {/* Add the slider */}
       <div className="flex items-center mb-6 justify-center">
-        <label className="mr-2">Create Airdrop</label>
+        <label className="mr-2">Create Retrospective Rewards</label>
         <div className="relative inline-block w-10 mr-2 align-middle select-none">
           <input
             type="checkbox"
@@ -425,7 +425,7 @@ export default function Index() {
             }}
           ></label>
         </div>
-        <label className="ml-2">Manage Airdrop</label>
+        <label className="ml-2">Manage Retrospective Rewards</label>
       </div>
       {/* Render the appropriate content based on the slider */}
       {isCreatingAirdrop ? (
@@ -433,7 +433,7 @@ export default function Index() {
           <div className="w-full max-w-md">
             <div className="text-3xl font-bold mb-8 flex flex-col items-between text-center">
               <h1 className="text-3xl font-bold">
-                Grant Airdrop to be initiated by
+                Retrospective Rewards to be initiated by
               </h1>
               <div>
                 {isConnect ? (
@@ -550,7 +550,7 @@ export default function Index() {
                   isFundsDeposited ? "bg-blue-500" : "bg-gray-500"
                 }`}
               ></div>
-              <p className="ml-2">Airdrop</p>
+              <p className="ml-2">Retrospective Rewards</p>
             </div>
             {isFundsDeposited && (
               <div className="flex items-center justify-center">
@@ -577,7 +577,9 @@ export default function Index() {
             {/* Add your Manage Wallets code here */}
           </div>
           <div className="text-3xl font-bold mb-8 flex flex-col items-between text-center">
-            <h2 className="text-3xl font-bold">Airdrop History</h2>
+            <h2 className="text-3xl font-bold">
+              Retrospective Rewards History
+            </h2>
             {/* Add your Airdrop History code here */}
           </div>
         </div>
