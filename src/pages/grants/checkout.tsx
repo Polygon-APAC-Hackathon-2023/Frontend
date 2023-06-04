@@ -41,9 +41,11 @@ export default function CheckoutGrants() {
     functionName: "depositFunds",
     args: [
       grants.map((grant) => BigNumber.from(grant.id.toString())),
-      grants.map(
-        (grant) => ethers.utils.parseUnits(grant.amount.toString()),
-        BigNumber.from((decimals || 6).toString())
+      grants.map((grant) =>
+        ethers.utils.parseUnits(
+          grant.amount.toString(),
+          BigNumber.from((decimals || 6).toString())
+        )
       ),
       ethers.utils.parseUnits(
         totalAmount.toString(),

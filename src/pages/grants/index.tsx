@@ -37,7 +37,7 @@ export default function Grants() {
   const ITEMS_PER_PAGE = 12;
 
   const { data: grantsData, fetchNextPage } = useContractInfiniteReads({
-    cacheKey: "grants-data-1",
+    cacheKey: "grants-data-3",
     ...paginatedIndexesConfig(
       (index) => {
         return [
@@ -70,7 +70,7 @@ export default function Grants() {
         for await (const grantHash of page) {
           if (grantHash) {
             const data = await fetchData(grantHash as string);
-            console.log({ data });
+
             grants.push({
               id: index,
               name: data.title,
@@ -105,6 +105,7 @@ export default function Grants() {
               const selected = selectedGrants.some(
                 (obj) => obj.id === grant.id
               );
+              console.log({ grant });
               return (
                 <Card
                   minW="xs"
