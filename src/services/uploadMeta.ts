@@ -1,14 +1,22 @@
-import { NFTStorage } from "nft.storage";
 import * as IPFS from "ipfs";
 
 declare global {
   var ipfs: IPFS.IPFS | undefined;
 }
 
-const client = globalThis.ipfs || IPFS.create();
+let ipfsInstance: IPFS.IPFS | undefined;
+
+const getIPFSInstance = async (): Promise<IPFS.IPFS> => {
+  if (ipfsInstance) {
+    return ipfsInstance;
+  } else {
+    ipfsInstance = await IPFS.create();
+    return ipfsInstance;
+  }
+};
 
 export const uploadMetadata = async (metadata: any) => {
-  const node = await client;
+  const node = await getIPFSInstance();
   const data = JSON.stringify(metadata);
   const results = await node.add(data);
   console.log(results);
@@ -16,21 +24,28 @@ export const uploadMetadata = async (metadata: any) => {
 };
 
 export const fetchData = async (hash: string) => {
-  const node = await client;
-  const stream = node.cat(hash);
-  const decoder = new TextDecoder();
-  let data = "";
+  try {
+    const node = await getIPFSInstance();
+    const stream = node.cat(hash);
+    const decoder = new TextDecoder();
+    let data = "";
 
-  for await (const chunk of stream) {
-    // chunks of data are returned as a Uint8Array, convert it back to a string
-    try {
-      data += decoder.decode(chunk, { stream: true });
-    } catch (err) {
-      console.log(err);
+    for await (const chunk of stream) {
+      // chunks of data are returned as a Uint8Array, convert it back to a string
+      try {
+        data += decoder.decode(chunk, { stream: true });
+      } catch (err) {
+        console.log(err);
+      }
     }
+    return JSON.parse(data);
+  } catch (err) {
+    console.log(err);
   }
 
-  return JSON.parse(data);
+  return {
+    name: "New Grant",
+  };
 };
 
 // QmbCBN7cjAdMhGrv65Xi5i1qs5VF6NTanHk1EMyofjkbWH

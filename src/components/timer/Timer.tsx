@@ -41,13 +41,13 @@ const Timer = ({ endDate }: Props) => {
   Object.keys(timeLeft).forEach((interval) => {
     const key = interval as keyof TimeLeft;
 
-    if (!timeLeft[key]) {
+    if (!(timeLeft as any)[key]) {
       return;
     }
 
     timerComponents.push(
       <span key={interval}>
-        {timeLeft[key]} {interval}{" "}
+        {(timeLeft as any)[key]} {interval}{" "}
       </span>
     );
   });

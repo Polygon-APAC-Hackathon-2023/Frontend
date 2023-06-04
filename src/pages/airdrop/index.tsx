@@ -287,7 +287,7 @@ export default function Index() {
     console.log(json);
   };
 
-  const getHypercertBalance = async (address) => {
+  const getHypercertBalance = async (address: any) => {
     const data = await fetchHypercertBalance(
       "0x79Ba287a5b8FDf3d290238a58476A3eA1dA9B514"
     );
@@ -324,13 +324,13 @@ export default function Index() {
     const json = await response.json();
     console.log(json.data[0].address);
     //the data is in json.data, so iterate over it and remove duplicate addresses
-    const addresses = json.data.map((item) => [item.address, item.id]);
+    const addresses = json.data.map((item: any) => [item.address, item.id]);
     //now in addresses, remove all duplicate addresses by checking the first element of each array
-    const uniqueAddresses = Array.from(new Set(addresses.map((a) => a[0]))).map(
-      (address) => {
-        return addresses.find((a) => a[0] === address);
-      }
-    );
+    const uniqueAddresses = Array.from(
+      new Set(addresses.map((a: any) => a[0]))
+    ).map((address) => {
+      return addresses.find((a: any) => a[0] === address);
+    });
     console.log(uniqueAddresses);
 
     //for each of the unique address, create a payout request

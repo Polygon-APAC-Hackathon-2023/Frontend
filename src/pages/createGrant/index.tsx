@@ -24,7 +24,6 @@ import {
 import Hypercert from "../../../public/Hypercert.json";
 import { BigNumber } from "ethers";
 import { HYPERCERT_CONTRACT } from "../../../utils/constants";
-import CreateGrantSuccess from "@/components/createGrantSuccess";
 import { useRouter, Router } from "next/router";
 
 const CreateGrant = () => {
