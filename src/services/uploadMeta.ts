@@ -16,21 +16,28 @@ export const uploadMetadata = async (metadata: any) => {
 };
 
 export const fetchData = async (hash: string) => {
-  const node = await client;
-  const stream = node.cat(hash);
-  const decoder = new TextDecoder();
-  let data = "";
+  try {
+    const node = await client;
+    const stream = node.cat(hash);
+    const decoder = new TextDecoder();
+    let data = "";
 
-  for await (const chunk of stream) {
-    // chunks of data are returned as a Uint8Array, convert it back to a string
-    try {
-      data += decoder.decode(chunk, { stream: true });
-    } catch (err) {
-      console.log(err);
+    for await (const chunk of stream) {
+      // chunks of data are returned as a Uint8Array, convert it back to a string
+      try {
+        data += decoder.decode(chunk, { stream: true });
+      } catch (err) {
+        console.log(err);
+      }
     }
+    return JSON.parse(data);
+  } catch (err) {
+    console.log(err);
   }
 
-  return JSON.parse(data);
+  return {
+    name: "New Grant",
+  };
 };
 
 // QmbCBN7cjAdMhGrv65Xi5i1qs5VF6NTanHk1EMyofjkbWH
