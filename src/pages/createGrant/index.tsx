@@ -23,12 +23,13 @@ import {
 } from "wagmi";
 import Hypercert from "../../../public/Hypercert.json";
 import { BigNumber } from "ethers";
+import { HYPERCERT_CONTRACT } from "../../../utils/constants";
 
 const CreateGrant = () => {
   const [name, setName] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   const [workScope, setWorkScope] = useState<string>("");
-  const [startDate, setStartDate] = useState<string>("");
+  const [startDate, setStartDate] = useState<number>(0);
   const [endDate, setEndDate] = useState<number>(0);
   const [contributors, setContributors] = useState<string>("");
   const [result, setResult] = useState<string>("");
@@ -36,8 +37,8 @@ const CreateGrant = () => {
   const [projectLink, setProjectLink] = useState<string>("");
 
   const { config } = usePrepareContractWrite({
-    address: "0x0cDaa4A6df7b761C9785b399470e947e011E1955",
-    abi: Hypercert.abi,
+    address: HYPERCERT_CONTRACT.address,
+    abi: HYPERCERT_CONTRACT.abi,
     functionName: "createGrant",
     args: [name, BigNumber.from(BigInt(endGrant)), result],
   });
@@ -49,7 +50,7 @@ const CreateGrant = () => {
 
   const handleSubmit = async () => {
     //call contract
-    console.log(name, description, workScope, startDate, endDate);
+
     const result = await uploadMetadata({
       title: name,
       description: description,
@@ -63,6 +64,7 @@ const CreateGrant = () => {
         endGrant: BigNumber.from(BigInt(endGrant)),
       },
     });
+
     setResult(result.path);
     if (write) {
       write();
@@ -111,7 +113,9 @@ const CreateGrant = () => {
                     placeholder="Select Date and Time"
                     size="lg"
                     type="date"
-                    onChange={(e) => setStartDate(e.target.value)}
+                    onChange={(e) => {
+                      setStartDate(new Date(e.target.value).getTime() / 1000);
+                    }}
                   />
                 </div>
                 <div>

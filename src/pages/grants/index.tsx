@@ -1,4 +1,3 @@
-import Image from "next/image";
 import { useGrantCartStore } from "../../../utils/store";
 import { toast } from "react-hot-toast";
 import clsx from "clsx";
@@ -7,6 +6,19 @@ import { paginatedIndexesConfig, useContractInfiniteReads } from "wagmi";
 import { useEffect, useState } from "react";
 import { fetchData } from "@/services/uploadMeta";
 import { HYPERCERT_CONTRACT } from "../../../utils/constants";
+import Timer from "@/components/timer/Timer";
+import {
+  Card,
+  Image,
+  CardBody,
+  Stack,
+  Heading,
+  Divider,
+  CardFooter,
+  ButtonGroup,
+  Button,
+  Text,
+} from "@chakra-ui/react";
 
 interface Grant {
   id: number;
@@ -25,7 +37,7 @@ export default function Grants() {
   const ITEMS_PER_PAGE = 12;
 
   const { data: grantsData, fetchNextPage } = useContractInfiniteReads({
-    cacheKey: "grants-data",
+    cacheKey: "grants-data-1",
     ...paginatedIndexesConfig(
       (index) => {
         return [
@@ -58,11 +70,12 @@ export default function Grants() {
         for await (const grantHash of page) {
           if (grantHash) {
             const data = await fetchData(grantHash as string);
+            console.log({ data });
             grants.push({
               id: index,
-              name: data.name,
+              name: data.title,
               description: data.description || "Donate to this grant!",
-              image: data.image || `https://picsum.photos/${index}/256`,
+              image: data.image || `https://picsum.photos/id/${index}/512/512`,
             });
             index++;
           }
@@ -93,34 +106,43 @@ export default function Grants() {
                 (obj) => obj.id === grant.id
               );
               return (
-                <div
-                  className={clsx(
-                    "flex flex-col w-full items-center bg-slate-400 rounded-lg overflow-hidden max-w-xs hover:scale-110 transform transition-transform cursor-pointer",
-                    selected ? "border-4 border-emerald-500" : ""
-                  )}
+                <Card
+                  minW="xs"
+                  key={grant.id}
                   onClick={() =>
                     selected
                       ? removeGrantFromCart(grant.id)
                       : addGrantToCart(grant)
                   }
-                  key={grant.id}
+                  className={clsx(
+                    selected ? "border-4 border-teal-500" : "",
+                    "cursor-pointer rounded-lg"
+                  )}
                 >
-                  <div className="flex aspect-square w-full relative">
+                  <CardBody
+                    className={clsx(
+                      selected ? "border-4 border-emerald-400" : "",
+                      "rounded-lg"
+                    )}
+                  >
                     <Image
                       src={grant.image}
-                      alt="Random"
-                      fill
-                      className="object-cover"
+                      alt="grant"
+                      borderRadius="lg"
+                      className="w-full h-full"
                     />
-                  </div>
-                  <div className="flex flex-col w-full p-4 gap-y-2">
-                    <p className="font-bold text-lg">{grant.name}</p>
-                    <p className="line-clamp-3">{grant.description}</p>
+                    <Stack mt="6" spacing="3">
+                      <Heading size="md">{grant.name}</Heading>
+                      <Text>{grant.description}</Text>
+                    </Stack>
+                  </CardBody>
+                  <Divider />
+                  <CardFooter className="flex-col">
                     <p className="text-ellipsis overflow-hidden text-sm">
                       Token ID: {grant.id}
                     </p>
-                  </div>
-                </div>
+                  </CardFooter>
+                </Card>
               );
             })}
         </div>

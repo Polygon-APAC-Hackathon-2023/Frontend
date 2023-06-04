@@ -1,4 +1,3 @@
-import Image from "next/image";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import React, { useEffect, useState } from "react";
 import { fetchHypercertBalance } from "../../graphql/queries";
@@ -10,6 +9,16 @@ import {
 import { HYPERCERT_CONTRACT } from "../../utils/constants";
 import { fetchData } from "@/services/uploadMeta";
 import clsx from "clsx";
+import {
+  Card,
+  CardBody,
+  Stack,
+  Heading,
+  Divider,
+  CardFooter,
+  Image,
+  Text,
+} from "@chakra-ui/react";
 
 export default function Home() {
   const { address, status } = useAccount();
@@ -18,7 +27,7 @@ export default function Home() {
   const ITEMS_PER_PAGE = 12;
 
   const { data: grantsData, fetchNextPage } = useContractInfiniteReads({
-    cacheKey: "grants-data",
+    cacheKey: "grants-data-1",
     ...paginatedIndexesConfig(
       (index) => {
         return [
@@ -37,6 +46,7 @@ export default function Home() {
     const getGrantsInfo = async () => {
       const grants = [];
       let index = 0;
+      console.log({ grantsData });
       for await (const page of grantsData!.pages) {
         for await (const grantHash of page) {
           if (grantHash) {
@@ -45,7 +55,7 @@ export default function Home() {
               id: index,
               name: data.name,
               description: data.description || "Donate to this grant!",
-              image: data.image || `https://picsum.photos/${index}/256`,
+              image: data.image || `https://picsum.photos/id/${index}/512/512`,
             });
             index++;
           }
@@ -72,6 +82,8 @@ export default function Home() {
         balances[identifier] = valueExact;
       });
 
+      console.log(balances);
+
       setBalances(balances);
     };
 
@@ -94,31 +106,29 @@ export default function Home() {
         <div className="grid grid-cols-3 items-center justify-center w-full gap-6 lg:gap-x-12 my-4">
           {grants &&
             grants
-              .filter((item: any) => balances.hasOwnProperty(item.id))
+              .filter((item: any) => balances?.hasOwnProperty(item.id))
               .map((grant: any) => {
                 return (
-                  <div
-                    className={clsx(
-                      "flex flex-col w-full items-center bg-slate-400 rounded-lg overflow-hidden max-w-xs hover:scale-110 transform transition-transform cursor-pointer"
-                    )}
-                    key={grant.id}
-                  >
-                    <div className="flex aspect-square w-full relative">
+                  <Card minW="xs" key={grant.id} className={clsx("rounded-lg")}>
+                    <CardBody>
                       <Image
                         src={grant.image}
-                        alt="Random"
-                        fill
-                        className="object-cover"
+                        alt="grant"
+                        borderRadius="lg"
+                        className="w-full h-full"
                       />
-                    </div>
-                    <div className="flex flex-col w-full p-4 gap-y-2">
-                      <p className="font-bold text-lg">{grant.name}</p>
-                      <p className="line-clamp-3">{grant.description}</p>
+                      <Stack mt="6" spacing="3">
+                        <Heading size="md">{grant.name}</Heading>
+                        <Text>{grant.description}</Text>
+                      </Stack>
+                    </CardBody>
+                    <Divider />
+                    <CardFooter className="flex-col">
                       <p className="text-ellipsis overflow-hidden text-sm">
                         Token ID: {grant.id}
                       </p>
-                    </div>
-                  </div>
+                    </CardFooter>
+                  </Card>
                 );
               })}
         </div>

@@ -6,6 +6,7 @@ interface GrantCheckoutItem {
   id: number;
   image: string;
   name: string;
+  description?: string;
   amount: number;
 }
 

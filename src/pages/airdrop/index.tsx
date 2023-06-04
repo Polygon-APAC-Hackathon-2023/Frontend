@@ -5,11 +5,11 @@ import { MetaMaskConnector } from "wagmi/connectors/metaMask";
 import { InjectedConnector } from "wagmi/connectors/injected";
 import Hypercert from "../../../public/Hypercert.json";
 import fetch from "node-fetch";
-import { fetchHypercertBalance } from "../../../graphql/queries";
-import { createRecord } from "../../../graphql/airdrop";
-
-const hypercertAddress = "0x2084200f96AFc5d2e0e59829F875F296d25F49D7";
-
+import { HYPERCERT_CONTRACT } from "../../../utils/constants";
+import {
+  fetchHypercertBalance,
+  fetchHoldersOfTokenID,
+} from "../../../graphql/queries";
 const connector = new MetaMaskConnector({
   chains: [localhost, polygonMumbai],
 });
@@ -119,7 +119,7 @@ export async function checkTransferStatus(walletID: number) {
   return status;
 }
 
-export default function Airdrop() {
+export default function Index() {
   const [selectedTokenID, setSelectedTokenID] = useState("");
   const [isGrantVerified, setIsGrantVerified] = useState(false);
   const [isFundsDeposited, setIsFundsDeposited] = useState(false);
@@ -158,8 +158,8 @@ export default function Airdrop() {
   //set is funds deposited to true
 
   const { data: grantEnded } = useContractRead({
-    abi: Hypercert.abi,
-    address: hypercertAddress,
+    abi: HYPERCERT_CONTRACT.abi,
+    address: HYPERCERT_CONTRACT.address,
     functionName: "grantEnded(uint256)",
     args: [selectedTokenID],
     watch: true,
@@ -169,8 +169,8 @@ export default function Airdrop() {
   });
 
   const { data: grantOwner } = useContractRead({
-    abi: Hypercert.abi,
-    address: hypercertAddress,
+    abi: HYPERCERT_CONTRACT.abi,
+    address: HYPERCERT_CONTRACT.address,
     functionName: "grantOwner(uint256)",
     args: [selectedTokenID],
     watch: true,
@@ -180,8 +180,8 @@ export default function Airdrop() {
   });
 
   const { data: grantInfo } = useContractRead({
-    abi: Hypercert.abi,
-    address: hypercertAddress,
+    abi: HYPERCERT_CONTRACT.abi,
+    address: HYPERCERT_CONTRACT.address,
     functionName: "grantInfo(uint256)",
     args: [selectedTokenID],
     watch: true,
@@ -207,6 +207,10 @@ export default function Airdrop() {
       setIsGrantVerified(false);
       alert("Grant has not ended or you are not the grant owner");
     }
+
+    //call fetchHoldersOfTokenID() function
+    const holders = await fetchHoldersOfTokenID(selectedTokenID);
+    console.log(holders);
   };
 
   const handleDepositFunds = async (description: string) => {
@@ -258,7 +262,7 @@ export default function Airdrop() {
   const createAirdropParticipants = async (walletAddress: string) => {
     const idempotencyKey = uuidv4();
 
-    const grantName = grantInfo.grantName;
+    const grantName = (grantInfo as any).grantName;
     //remove all spaces from the grant name
     const newGrantName = grantName.replace(/\s/g, "");
     const url = "https://api-sandbox.circle.com/v1/addressBook/recipients";
@@ -303,7 +307,7 @@ export default function Airdrop() {
   const createPayouts = async () => {
     const idempotencyKey = uuidv4();
 
-    const grantName = grantInfo.grantName;
+    const grantName = (grantInfo as any).grantName;
     //remove all spaces from the grant name
     const newGrantName = grantName.replace(/\s/g, "");
     const url = `https://api-sandbox.circle.com/v1/addressBook/recipients?email=${newGrantName}%40reignite.com`;
@@ -554,7 +558,7 @@ export default function Airdrop() {
                   className="px-4 py-2 bg-blue-500 text-white rounded"
                   onClick={() => handleAirdrop()}
                 >
-                  Initiate Airdrop
+                  Initiate Retrospective Rewards
                 </button>
               </div>
             )}
