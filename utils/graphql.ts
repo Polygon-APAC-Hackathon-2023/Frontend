@@ -8,4 +8,15 @@ const client = new ApolloClient({
   },
 });
 
+const airdropClient = new ApolloClient({
+  uri: "https://reignite-db-dfd4.gke-singapore.settlemint.com/v1/graphql",
+  cache: new InMemoryCache(),
+  headers: {
+    "x-auth-token": "bpaas-1Ed9609d331838065C05a489268Acd13290e38a3",
+    "x-hasura-admin-secret": "627fcb1ec6b3569880f3",
+  },
+});
+
 export default client;
+
+export { airdropClient };

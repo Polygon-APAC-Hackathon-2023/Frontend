@@ -124,6 +124,7 @@ export default function Index() {
   const [isGrantVerified, setIsGrantVerified] = useState(false);
   const [isFundsDeposited, setIsFundsDeposited] = useState(false);
   const [isWalletAddressCreated, setIsWalletAddressCreated] = useState(false);
+  const [isAddressesAdded, setIsAddressesAdded] = useState(false);
   const [walletAddress, setWalletAddress] = useState("");
   const [inputError, setInputError] = useState(false);
   const [isVerificationClicked, setIsVerificationClicked] = useState(false);
@@ -131,6 +132,7 @@ export default function Index() {
   const [walletID, setWalletID] = useState(null);
   const [idempotencyKey, setIdempotencyKey] = useState("");
   const [isCreatingAirdrop, setIsCreatingAirdrop] = useState(true);
+  const [isAirdropped, setIsAirdropped] = useState(false);
 
   const { isConnected, address } = useAccount();
   const [isConnect, setIsConnect] = useState(false);
@@ -212,6 +214,14 @@ export default function Index() {
   };
 
   const handleDepositFunds = async (description: string) => {
+    interface Wallet {
+      walletAddress: any;
+      walletID: string;
+      idempotencyKey: string;
+      description: string;
+      depositAddress: string;
+    }
+
     //call createWallet() function
     const [walletID, idempotencyKey] = await createWallet(description);
     console.log(walletID, idempotencyKey);
@@ -219,9 +229,23 @@ export default function Index() {
     setIdempotencyKey(idempotencyKey);
 
     //call createBlockchainAddress() function
-    const address = await createBlockchainAddress(walletID, idempotencyKey);
-    console.log(address);
-    setWalletAddress(address);
+    const depositAddress = await createBlockchainAddress(
+      walletID,
+      idempotencyKey
+    );
+    console.log(depositAddress);
+    setWalletAddress(depositAddress);
+
+    let wallet: Wallet = {
+      walletAddress: address,
+      walletID: walletID,
+      idempotencyKey: idempotencyKey,
+      description: description,
+      depositAddress: depositAddress,
+    };
+
+    // const data = await createRecord(wallet);
+    // console.log(data);
   };
 
   const handleDepositCheck = async (walletID: number) => {
@@ -263,6 +287,23 @@ export default function Index() {
     console.log(json);
   };
 
+  const getHypercertBalance = async (address) => {
+    const data = await fetchHypercertBalance(
+      "0x79Ba287a5b8FDf3d290238a58476A3eA1dA9B514"
+    );
+    console.log(data);
+
+    const balances: { [key: string]: string } = {};
+
+    data.account?.ERC1155balances?.forEach((balance: any) => {
+      const identifier = balance.token.identifier;
+      const valueExact = balance.token.balances[0].valueExact;
+      balances[identifier] = valueExact;
+    });
+
+    console.log(balances);
+  };
+
   const createPayouts = async () => {
     const idempotencyKey = uuidv4();
 
@@ -282,20 +323,76 @@ export default function Index() {
 
     const json = await response.json();
     console.log(json.data[0].address);
-    for (let i = 0; i < json.data.length; i++) {
-      //make sure there are no duplicate addresses in the array
-      if (json.data[i].address !== json.data[i + 1]?.address) {
-        console.log(json.data[i].address);
+    //the data is in json.data, so iterate over it and remove duplicate addresses
+    const addresses = json.data.map((item) => [item.address, item.id]);
+    //now in addresses, remove all duplicate addresses by checking the first element of each array
+    const uniqueAddresses = Array.from(new Set(addresses.map((a) => a[0]))).map(
+      (address) => {
+        return addresses.find((a) => a[0] === address);
       }
-    }
+    );
+    console.log(uniqueAddresses);
+
+    //for each of the unique address, create a payout request
+    uniqueAddresses.forEach(async (address) => {
+      const url = "https://api-sandbox.circle.com/v1/payouts";
+      const options = {
+        method: "POST",
+        headers: {
+          accept: "application/json",
+          "content-type": "application/json",
+          authorization: `Bearer ${process.env.NEXT_PUBLIC_CIRCLE_API_KEY}`,
+        },
+        body: JSON.stringify({
+          source: {
+            type: "wallet",
+            identities: [
+              {
+                type: "individual",
+                addresses: [
+                  {
+                    line1: "100",
+                    city: "Test",
+                    district: "Test",
+                    postalCode: "10000",
+                    country: "Te",
+                  },
+                ],
+                name: "ReIgnite",
+              },
+            ],
+            id: walletID,
+          },
+          destination: { type: "address_book", id: address[1] },
+          amount: { currency: "USD", amount: 0.1 },
+          toAmount: { currency: "USD" },
+          idempotencyKey: idempotencyKey,
+        }),
+      };
+
+      const response = await fetch(url, options);
+
+      const json = await response.json();
+      console.log(json);
+    });
   };
 
-  const handleAirdrop = () => {
-    //include a way to get the wallet addresses from the subgraph
-    //call createAirdropParticipants() function
-    const walletAddress: string = "0x07e96f02d57A1F0EACe103028D0b26fd2D5f283E";
-    createAirdropParticipants(walletAddress);
-    createPayouts();
+  const handleAirdrop = async () => {
+    //include a way to get the wallet addresses from the subgraph, for now its hardcoded
+    //dictionary containing wallet address to token holdings mapping
+    const walletAddresses = {
+      "0x79Ba287a5b8FDf3d290238a58476A3eA1dA9B514": 100,
+      "0x07e96f02d57A1F0EACe103028D0b26fd2D5f283E": 200,
+    };
+
+    for (const [key, value] of Object.entries(walletAddresses)) {
+      await createAirdropParticipants(key);
+    }
+    setIsAddressesAdded(true);
+
+    //call createPayouts() function
+    await createPayouts();
+    setIsAirdropped(true);
   };
 
   useEffect(() => {
@@ -463,6 +560,12 @@ export default function Index() {
                 >
                   Initiate Retrospective Rewards
                 </button>
+              </div>
+            )}
+            {isAddressesAdded && (
+              <div className="flex items-center mt-1 md-5 justify-center">
+                <div className="w-3 h-3 rounded-full bg-green-500 mr-5"></div>
+                <p>Addresses added</p>
               </div>
             )}
           </div>
