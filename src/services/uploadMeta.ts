@@ -1,14 +1,22 @@
-import { NFTStorage } from "nft.storage";
 import * as IPFS from "ipfs";
 
 declare global {
   var ipfs: IPFS.IPFS | undefined;
 }
 
-const client = globalThis.ipfs || IPFS.create();
+let ipfsInstance: IPFS.IPFS | undefined;
+
+const getIPFSInstance = async (): Promise<IPFS.IPFS> => {
+  if (ipfsInstance) {
+    return ipfsInstance;
+  } else {
+    ipfsInstance = await IPFS.create();
+    return ipfsInstance;
+  }
+};
 
 export const uploadMetadata = async (metadata: any) => {
-  const node = await client;
+  const node = await getIPFSInstance();
   const data = JSON.stringify(metadata);
   const results = await node.add(data);
   console.log(results);
@@ -17,7 +25,7 @@ export const uploadMetadata = async (metadata: any) => {
 
 export const fetchData = async (hash: string) => {
   try {
-    const node = await client;
+    const node = await getIPFSInstance();
     const stream = node.cat(hash);
     const decoder = new TextDecoder();
     let data = "";
