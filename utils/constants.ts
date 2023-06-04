@@ -19,6 +19,6 @@ export const FUNDING_POOL_CONTRACT = {
 };
 
 export const QF_POOL_CONTRACT = {
-  address: "0xEA47f665A1535E1adf57f253f1551d8816aA60cc" as `0x${string}`,
+  address: "0xEA47f665A1535E1adf57f253f1551d8816aA60cc" as `0x${strin g}`,
   abi: QfPool.abi,
 };
