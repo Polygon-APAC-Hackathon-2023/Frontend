@@ -28,7 +28,7 @@ const Navbar = () => {
         </li>
         <li>
           <Button>
-            <Link href="/airdrop">Airdrop</Link>
+            <Link href="/airdrop">Retrospective Reward</Link>
           </Button>
         </li>
       </ul>
