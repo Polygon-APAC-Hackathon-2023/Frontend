@@ -6,8 +6,10 @@ import { InjectedConnector } from "wagmi/connectors/injected";
 import Hypercert from "../../../public/Hypercert.json";
 import fetch from "node-fetch";
 import { HYPERCERT_CONTRACT } from "../../../utils/constants";
-const querystring = require("querystring");
-
+import {
+  fetchHypercertBalance,
+  fetchHoldersOfTokenID,
+} from "../../../graphql/queries";
 const connector = new MetaMaskConnector({
   chains: [localhost, polygonMumbai],
 });
@@ -117,7 +119,7 @@ export async function checkTransferStatus(walletID: number) {
   return status;
 }
 
-export default function Airdrop() {
+export default function Index() {
   const [selectedTokenID, setSelectedTokenID] = useState("");
   const [isGrantVerified, setIsGrantVerified] = useState(false);
   const [isFundsDeposited, setIsFundsDeposited] = useState(false);
@@ -203,6 +205,10 @@ export default function Airdrop() {
       setIsGrantVerified(false);
       alert("Grant has not ended or you are not the grant owner");
     }
+
+    //call fetchHoldersOfTokenID() function
+    const holders = await fetchHoldersOfTokenID(selectedTokenID);
+    console.log(holders);
   };
 
   const handleDepositFunds = async (description: string) => {
@@ -455,7 +461,7 @@ export default function Airdrop() {
                   className="px-4 py-2 bg-blue-500 text-white rounded"
                   onClick={() => handleAirdrop()}
                 >
-                  Initiate Airdrop
+                  Initiate Retrospective Rewards
                 </button>
               </div>
             )}
